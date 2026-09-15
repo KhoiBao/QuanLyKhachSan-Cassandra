@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Phòng - Quản lý khách sạn</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">H</div>
+
+            <div>
+                <h2>Hotel Manager</h2>
+                <span>Quản lý khách sạn</span>
+            </div>
+        </div>
+
+        <nav class="menu">
+
+            <a href="/" class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="/hotels" class="menu-item">
+                <span>▣</span>
+                Khách sạn
+            </a>
+
+            <a href="/rooms" class="menu-item active">
+                <span>▤</span>
+                Phòng
+            </a>
+
+            <a href="/customers" class="menu-item">
+                <span>♙</span>
+                Khách hàng
+            </a>
+
+            <a href="/bookings" class="menu-item">
+                <span>▧</span>
+                Đặt phòng
+            </a>
+
+            <a href="/invoices" class="menu-item">
+                <span>▤</span>
+                Hóa đơn
+            </a>
+
+            <a href="/reports" class="menu-item">
+                <span>◫</span>
+                Báo cáo doanh thu
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user">
+
+                <div class="avatar">
+                    A
+                </div>
+
+                <div>
+                    <strong>Admin</strong>
+                    <small>Quản trị viên</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div>
+                <h1>Quản lý phòng</h1>
+                <p>Quản lý thông tin và trạng thái các phòng</p>
+            </div>
+
+            <div class="header-right">
+
+                <button class="notification">
+                    🔔
+                </button>
+
+                <div class="date">
+                    📅 15/09/2026
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <section class="card bookings-card">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Danh sách phòng</h3>
+                    <p>Thông tin phòng của các khách sạn</p>
+                </div>
+
+                <div>
+
+                    <input
+                            type="text"
+                            placeholder="Tìm phòng..."
+                            class="search-box"
+                    >
+
+                    <button class="btn">
+                        + Thêm phòng
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTER -->
+            <div class="filter-container">
+
+                <select class="filter-select">
+
+                    <option value="">
+                        Tất cả trạng thái
+                    </option>
+
+                    <option>
+                        Trống
+                    </option>
+
+                    <option>
+                        Đã đặt
+                    </option>
+
+                    <option>
+                        Bảo trì
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- TABLE -->
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+                        <th>Số phòng</th>
+                        <th>Khách sạn</th>
+                        <th>Loại phòng</th>
+                        <th>Giá phòng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    <tr>
+
+                        <td>
+                            <strong>101</strong>
+                        </td>
+
+                        <td>
+                            Grand Hotel TP.HCM
+                        </td>
+
+                        <td>
+                            Standard
+                        </td>
+
+                        <td>
+                            500.000đ
+                        </td>
+
+                        <td>
+                            <span class="badge available">
+                                Trống
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>102</strong>
+                        </td>
+
+                        <td>
+                            Grand Hotel TP.HCM
+                        </td>
+
+                        <td>
+                            Deluxe
+                        </td>
+
+                        <td>
+                            800.000đ
+                        </td>
+
+                        <td>
+                            <span class="badge confirmed">
+                                Đã đặt
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>201</strong>
+                        </td>
+
+                        <td>
+                            Sunshine Hotel Đà Nẵng
+                        </td>
+
+                        <td>
+                            Suite
+                        </td>
+
+                        <td>
+                            1.500.000đ
+                        </td>
+
+                        <td>
+                            <span class="badge cancelled">
+                                Bảo trì
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>202</strong>
+                        </td>
+
+                        <td>
+                            Sunshine Hotel Đà Nẵng
+                        </td>
+
+                        <td>
+                            Deluxe
+                        </td>
+
+                        <td>
+                            900.000đ
+                        </td>
+
+                        <td>
+                            <span class="badge available">
+                                Trống
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>301</strong>
+                        </td>
+
+                        <td>
+                            Royal Hotel Hà Nội
+                        </td>
+
+                        <td>
+                            Standard
+                        </td>
+
+                        <td>
+                            600.000đ
+                        </td>
+
+                        <td>
+                            <span class="badge confirmed">
+                                Đã đặt
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đặt phòng - Quản lý khách sạn</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">H</div>
+
+            <div>
+                <h2>Hotel Manager</h2>
+                <span>Quản lý khách sạn</span>
+            </div>
+        </div>
+
+
+        <nav class="menu">
+
+            <a href="/" class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="/hotels" class="menu-item">
+                <span>▣</span>
+                Khách sạn
+            </a>
+
+            <a href="/rooms" class="menu-item">
+                <span>▤</span>
+                Phòng
+            </a>
+
+            <a href="/customers" class="menu-item">
+                <span>♙</span>
+                Khách hàng
+            </a>
+
+            <a href="/bookings" class="menu-item active">
+                <span>▧</span>
+                Đặt phòng
+            </a>
+
+            <a href="/invoices" class="menu-item">
+                <span>▤</span>
+                Hóa đơn
+            </a>
+
+            <a href="/reports" class="menu-item">
+                <span>◫</span>
+                Báo cáo doanh thu
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="user">
+
+                <div class="avatar">
+                    A
+                </div>
+
+                <div>
+                    <strong>Admin</strong>
+                    <small>Quản trị viên</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+    <main class="main">
+
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div>
+
+                <h1>Quản lý đặt phòng</h1>
+
+                <p>
+                    Theo dõi các đơn đặt phòng
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <button class="notification">
+                    🔔
+                </button>
+
+                <div class="date">
+                    📅 15/09/2026
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+        <section class="card bookings-card">
+
+
+            <!-- TABLE HEADER -->
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Danh sách đặt phòng
+                    </h3>
+
+                    <p>
+                        Danh sách các đơn đặt phòng trong hệ thống
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <input
+                            type="text"
+                            placeholder="Tìm mã đặt phòng..."
+                            class="search-box"
+                    >
+
+                    <button class="btn">
+                        + Đặt phòng
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= TABLE ================= -->
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>
+                            Mã đặt phòng
+                        </th>
+
+                        <th>
+                            Khách hàng
+                        </th>
+
+                        <th>
+                            Khách sạn
+                        </th>
+
+                        <th>
+                            Phòng
+                        </th>
+
+                        <th>
+                            Nhận phòng
+                        </th>
+
+                        <th>
+                            Trả phòng
+                        </th>
+
+                        <th>
+                            Trạng thái
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                    <!-- BOOKING 1 -->
+                    <tr>
+
+                        <td>
+                            <strong>
+                                #DP001
+                            </strong>
+                        </td>
+
+                        <td>
+                            Nguyễn Văn An
+                        </td>
+
+                        <td>
+                            Grand Hotel TP.HCM
+                        </td>
+
+                        <td>
+                            101
+                        </td>
+
+                        <td>
+                            15/09/2026
+                        </td>
+
+                        <td>
+                            17/09/2026
+                        </td>
+
+                        <td>
+                            <span class="badge confirmed">
+                                Đã đặt
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <!-- BOOKING 2 -->
+                    <tr>
+
+                        <td>
+                            <strong>
+                                #DP002
+                            </strong>
+                        </td>
+
+                        <td>
+                            Trần Thị Bình
+                        </td>
+
+                        <td>
+                            Sunshine Hotel Đà Nẵng
+                        </td>
+
+                        <td>
+                            205
+                        </td>
+
+                        <td>
+                            16/09/2026
+                        </td>
+
+                        <td>
+                            19/09/2026
+                        </td>
+
+                        <td>
+                            <span class="badge confirmed">
+                                Đã đặt
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <!-- BOOKING 3 -->
+                    <tr>
+
+                        <td>
+                            <strong>
+                                #DP003
+                            </strong>
+                        </td>
+
+                        <td>
+                            Lê Minh Hoàng
+                        </td>
+
+                        <td>
+                            Grand Hotel TP.HCM
+                        </td>
+
+                        <td>
+                            302
+                        </td>
+
+                        <td>
+                            20/09/2026
+                        </td>
+
+                        <td>
+                            22/09/2026
+                        </td>
+
+                        <td>
+                            <span class="badge pending">
+                                Chờ xác nhận
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <!-- BOOKING 4 -->
+                    <tr>
+
+                        <td>
+                            <strong>
+                                #DP004
+                            </strong>
+                        </td>
+
+                        <td>
+                            Phạm Thu Hà
+                        </td>
+
+                        <td>
+                            Hotel Garden
+                        </td>
+
+                        <td>
+                            405
+                        </td>
+
+                        <td>
+                            17/09/2026
+                        </td>
+
+                        <td>
+                            19/09/2026
+                        </td>
+
+                        <td>
+                            <span class="badge cancelled">
+                                Đã hủy
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

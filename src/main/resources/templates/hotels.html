@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Khách sạn - Quản lý khách sạn</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">H</div>
+
+            <div>
+                <h2>Hotel Manager</h2>
+                <span>Quản lý khách sạn</span>
+            </div>
+        </div>
+
+        <nav class="menu">
+
+            <a href="/" class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="/hotels" class="menu-item active">
+                <span>▣</span>
+                Khách sạn
+            </a>
+
+            <a href="/rooms" class="menu-item">
+                <span>▤</span>
+                Phòng
+            </a>
+
+            <a href="/customers" class="menu-item">
+                <span>♙</span>
+                Khách hàng
+            </a>
+
+            <a href="/bookings" class="menu-item">
+                <span>▧</span>
+                Đặt phòng
+            </a>
+
+            <a href="/invoices" class="menu-item">
+                <span>▤</span>
+                Hóa đơn
+            </a>
+
+            <a href="/reports" class="menu-item">
+                <span>◫</span>
+                Báo cáo doanh thu
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user">
+
+                <div class="avatar">
+                    A
+                </div>
+
+                <div>
+                    <strong>Admin</strong>
+                    <small>Quản trị viên</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div>
+                <h1>Quản lý khách sạn</h1>
+                <p>Quản lý thông tin các khách sạn trong hệ thống</p>
+            </div>
+
+            <div class="header-right">
+
+                <button class="notification">
+                    🔔
+                </button>
+
+                <div class="date">
+                    📅 15/09/2026
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <section class="card bookings-card">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Danh sách khách sạn</h3>
+                    <p>Thông tin các khách sạn đang được quản lý</p>
+                </div>
+
+                <div>
+
+                    <input
+                            type="text"
+                            placeholder="Tìm khách sạn..."
+                            class="search-box"
+                    >
+
+                    <button class="btn">
+                        + Thêm khách sạn
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+                        <th>Mã khách sạn</th>
+                        <th>Tên khách sạn</th>
+                        <th>Địa chỉ</th>
+                        <th>Số phòng</th>
+                        <th>Trạng thái</th>
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    <tr>
+
+                        <td>
+                            <strong>#KS001</strong>
+                        </td>
+
+                        <td>
+                            Grand Hotel TP.HCM
+                        </td>
+
+                        <td>
+                            123 Nguyễn Huệ
+                        </td>
+
+                        <td>
+                            120
+                        </td>
+
+                        <td>
+                            <span class="badge confirmed">
+                                Hoạt động
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#KS002</strong>
+                        </td>
+
+                        <td>
+                            Sunshine Hotel Đà Nẵng
+                        </td>
+
+                        <td>
+                            25 Võ Nguyên Giáp
+                        </td>
+
+                        <td>
+                            85
+                        </td>
+
+                        <td>
+                            <span class="badge confirmed">
+                                Hoạt động
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#KS003</strong>
+                        </td>
+
+                        <td>
+                            Royal Hotel Hà Nội
+                        </td>
+
+                        <td>
+                            88 Hoàn Kiếm
+                        </td>
+
+                        <td>
+                            100
+                        </td>
+
+                        <td>
+                            <span class="badge pending">
+                                Tạm ngưng
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
