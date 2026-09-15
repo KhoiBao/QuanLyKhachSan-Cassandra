@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS invoices_by_booking (
+booking_id UUID,
+invoice_id UUID,
+guest_id TEXT,
+hotel_id TEXT,
+room_charge DECIMAL,
+service_charge DECIMAL,
+tax DECIMAL,
+total_amount DECIMAL,
+payment_status TEXT, -- 'UNPAID' | 'PAID' | 'REFUNDED'
+issued_at TIMESTAMP,
+PRIMARY KEY (booking_id, invoice_id)
+);
