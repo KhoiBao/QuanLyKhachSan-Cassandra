@@ -49,6 +49,12 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Astra DataStax Driver -->
+		<dependency>
+			<groupId>com.datastax.oss</groupId>
+			<artifactId>java-driver-core</artifactId>
+			<version>4.17.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
