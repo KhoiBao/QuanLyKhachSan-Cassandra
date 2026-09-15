@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Khách hàng - Quản lý khách sạn</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">H</div>
+
+            <div>
+                <h2>Hotel Manager</h2>
+                <span>Quản lý khách sạn</span>
+            </div>
+        </div>
+
+        <nav class="menu">
+
+            <a href="/" class="menu-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="/hotels" class="menu-item">
+                <span>▣</span>
+                Khách sạn
+            </a>
+
+            <a href="/rooms" class="menu-item">
+                <span>▤</span>
+                Phòng
+            </a>
+
+            <a href="/customers" class="menu-item active">
+                <span>♙</span>
+                Khách hàng
+            </a>
+
+            <a href="/bookings" class="menu-item">
+                <span>▧</span>
+                Đặt phòng
+            </a>
+
+            <a href="/invoices" class="menu-item">
+                <span>▤</span>
+                Hóa đơn
+            </a>
+
+            <a href="/reports" class="menu-item">
+                <span>◫</span>
+                Báo cáo doanh thu
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user">
+
+                <div class="avatar">
+                    A
+                </div>
+
+                <div>
+                    <strong>Admin</strong>
+                    <small>Quản trị viên</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div>
+                <h1>Quản lý khách hàng</h1>
+                <p>Quản lý thông tin khách hàng của khách sạn</p>
+            </div>
+
+            <div class="header-right">
+
+                <button class="notification">
+                    🔔
+                </button>
+
+                <div class="date">
+                    📅 15/09/2026
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <section class="card bookings-card">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Danh sách khách hàng</h3>
+                    <p>Thông tin khách hàng đã đăng ký</p>
+                </div>
+
+                <div>
+
+                    <input
+                            type="text"
+                            placeholder="Tìm khách hàng..."
+                            class="search-box"
+                    >
+
+                    <button class="btn">
+                        + Thêm khách hàng
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+                        <th>Mã khách hàng</th>
+                        <th>Họ và tên</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>CCCD</th>
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    <tr>
+
+                        <td>
+                            <strong>#KH001</strong>
+                        </td>
+
+                        <td>
+                            Nguyễn Văn An
+                        </td>
+
+                        <td>
+                            0901234567
+                        </td>
+
+                        <td>
+                            an@gmail.com
+                        </td>
+
+                        <td>
+                            079123456789
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#KH002</strong>
+                        </td>
+
+                        <td>
+                            Trần Thị Bình
+                        </td>
+
+                        <td>
+                            0912345678
+                        </td>
+
+                        <td>
+                            binh@gmail.com
+                        </td>
+
+                        <td>
+                            079987654321
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#KH003</strong>
+                        </td>
+
+                        <td>
+                            Lê Minh Hoàng
+                        </td>
+
+                        <td>
+                            0987654321
+                        </td>
+
+                        <td>
+                            hoang@gmail.com
+                        </td>
+
+                        <td>
+                            079456123789
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>
+                            <strong>#KH004</strong>
+                        </td>
+
+                        <td>
+                            Phạm Thu Hà
+                        </td>
+
+                        <td>
+                            0938123456
+                        </td>
+
+                        <td>
+                            ha@gmail.com
+                        </td>
+
+                        <td>
+                            079345678912
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
