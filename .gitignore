@@ -31,4 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-config.jsonrun2_out.txt
+src/main/resources/config.json
