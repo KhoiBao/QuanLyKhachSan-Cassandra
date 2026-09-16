@@ -1,295 +1,135 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Hóa đơn - Quản lý khách sạn</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('invoices')}"></th:block>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item active">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="user">
-
-                <div class="avatar">
-                    A
-                </div>
-
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
     <main class="main">
+        <th:block th:replace="~{fragments :: header('Quản lý hóa đơn', 'Theo dõi các hóa đơn và tình trạng thanh toán')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-                <h1>Quản lý hóa đơn</h1>
-                <p>Quản lý các hóa đơn và tình trạng thanh toán</p>
-            </div>
-
-            <div class="header-right">
-
-                <button class="notification">
-                    🔔
-                </button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- CONTENT -->
         <section class="card bookings-card">
-
             <div class="card-header">
-
                 <div>
                     <h3>Danh sách hóa đơn</h3>
-                    <p>Theo dõi các hóa đơn phát sinh từ đơn đặt phòng</p>
+                    <p th:text="${#lists.size(invoices)} + ' hóa đơn phát sinh từ đơn đặt phòng'"></p>
                 </div>
-
-                <div>
-
-                    <input
-                            type="text"
-                            placeholder="Tìm hóa đơn..."
-                            class="search-box"
-                    >
-
-                </div>
-
+                <form th:action="@{/invoices}" method="get" class="filter-form">
+                    <input type="text" name="keyword" th:value="${fKeyword}"
+                           placeholder="Tìm hóa đơn / khách..." class="search-box">
+                    <select name="status" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}"
+                                th:selected="${fStatus != null && s == fStatus}">--</option>
+                    </select>
+                    <button type="submit" class="btn btn-ghost">Lọc</button>
+                    <button type="button" class="btn" onclick="toggleForm('invoiceForm')">+ Lập hóa đơn</button>
+                </form>
             </div>
 
+            <!-- FORM LAP HOA DON TU DON DAT PHONG -->
+            <form th:action="@{/invoices/create}" method="post" class="entity-form" id="invoiceForm" style="display:none">
+                <h4>Lập hóa đơn từ đơn đặt phòng</h4>
+                <div class="form-grid">
+                    <label class="span-2">Đơn đặt phòng
+                        <select name="bookingId" required>
+                            <option value="">-- Chọn đơn đặt phòng --</option>
+                            <option th:each="b : ${bookings}" th:value="${b.bookingId}"
+                                    th:text="${b.shortCode} + ' | ' + ${b.guestName} + ' | ' + ${b.hotelName} + ' phòng ' + ${b.roomNumber}">--</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Lập hóa đơn</button>
+                    <button type="button" class="btn btn-ghost" onclick="toggleForm('invoiceForm')">Hủy</button>
+                </div>
+            </form>
 
             <!-- TABLE -->
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                     <tr>
                         <th>Mã hóa đơn</th>
-                        <th>Mã đặt phòng</th>
+                        <th>Đơn đặt phòng</th>
                         <th>Khách hàng</th>
+                        <th>Khách sạn</th>
                         <th>Ngày lập</th>
+                        <th>Tiền phòng</th>
+                        <th>Phí dịch vụ</th>
+                        <th>VAT</th>
                         <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
                         <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
-
                     </thead>
-
-
                     <tbody>
-
-                    <tr>
-
+                    <tr th:each="inv : ${pageItems}">
+                        <td><strong th:text="${inv.shortCode}">HD-XXXX</strong></td>
+                        <td th:text="${inv.bookingId == null ? '--' : 'DP-' + #strings.substring(inv.bookingId.toString(), 0, 8)}">--</td>
+                        <td th:text="${inv.guestName}">--</td>
+                        <td th:text="${inv.hotelName}">--</td>
+                        <td th:text="${inv.issuedAt == null ? '--' : #temporals.format(inv.issuedAt, 'dd/MM/yyyy HH:mm')}">--</td>
+                        <td th:text="${#numbers.formatDecimal(inv.roomCharge, 0, 'COMMA', 0, 'POINT')}">0</td>
+                        <td th:text="${#numbers.formatDecimal(inv.serviceCharge, 0, 'COMMA', 0, 'POINT')}">0</td>
+                        <td th:text="${#numbers.formatDecimal(inv.tax, 0, 'COMMA', 0, 'POINT')}">0</td>
+                        <td><strong th:text="${#numbers.formatDecimal(inv.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></td>
+                        <td th:text="${inv.paidAt == null ? '--' : #temporals.format(inv.paidAt, 'dd/MM/yyyy HH:mm')}">--</td>
                         <td>
-                            <strong>#HD001</strong>
+                            <span class="badge" th:classappend="${inv.paymentStatus.cssClass}"
+                                  th:text="${inv.paymentStatus.label}">--</span>
                         </td>
-
-                        <td>
-                            DP001
+                        <td class="actions">
+                            <form th:if="${inv.payable}" th:action="@{/invoices/pay}" method="post"
+                                  class="inline-form pay-form"
+                                  th:data-confirm="${'Xác nhận thanh toán ' + inv.shortCode + '?'}">
+                                <input type="hidden" name="bookingId" th:value="${inv.bookingId}">
+                                <input type="hidden" name="invoiceId" th:value="${inv.invoiceId}">
+                                <select name="method" class="filter-select">
+                                    <option th:each="m : ${methods}" th:value="${m.name()}" th:text="${m.label}">--</option>
+                                </select>
+                                <button type="submit" class="btn-link">Thanh toán</button>
+                            </form>
+                            <form th:if="${inv.paymentStatus.isRefundable() and canRefund}"
+                                  th:action="@{/invoices/refund}" method="post" class="inline-form"
+                                  th:data-confirm="${'Hoàn tiền ' + inv.shortCode + '?'}">
+                                <input type="hidden" name="bookingId" th:value="${inv.bookingId}">
+                                <input type="hidden" name="invoiceId" th:value="${inv.invoiceId}">
+                                <button type="submit" class="btn-link btn-danger">Hoàn tiền</button>
+                            </form>
                         </td>
-
-                        <td>
-                            Nguyễn Văn An
-                        </td>
-
-                        <td>
-                            15/09/2026
-                        </td>
-
-                        <td>
-                            1.000.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Đã thanh toán
-                            </span>
-                        </td>
-
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#HD002</strong>
-                        </td>
-
-                        <td>
-                            DP002
-                        </td>
-
-                        <td>
-                            Trần Thị Bình
-                        </td>
-
-                        <td>
-                            16/09/2026
-                        </td>
-
-                        <td>
-                            4.500.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge pending">
-                                Chưa thanh toán
-                            </span>
-                        </td>
-
+                    <tr th:if="${#lists.isEmpty(pageItems)}">
+                        <td colspan="12" class="empty-state">Không có hóa đơn nào khớp bộ lọc.</td>
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#HD003</strong>
-                        </td>
-
-                        <td>
-                            DP003
-                        </td>
-
-                        <td>
-                            Lê Minh Hoàng
-                        </td>
-
-                        <td>
-                            20/09/2026
-                        </td>
-
-                        <td>
-                            1.600.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge pending">
-                                Chờ thanh toán
-                            </span>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#HD004</strong>
-                        </td>
-
-                        <td>
-                            DP004
-                        </td>
-
-                        <td>
-                            Phạm Thu Hà
-                        </td>
-
-                        <td>
-                            17/09/2026
-                        </td>
-
-                        <td>
-                            1.800.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge cancelled">
-                                Đã hủy
-                            </span>
-                        </td>
-
-                    </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
+            <div th:replace="~{fragments :: pagination(${currentPage}, ${totalPages})}"></div>
         </section>
-
     </main>
-
 </div>
-
+<script th:inline="javascript">
+    function toggleForm(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    // Xac nhan truoc khi submit cac form co data-confirm (cho phep JS chuan Thymeleaf 3.1)
+    document.addEventListener('submit', function (e) {
+        const msg = e.target.getAttribute('data-confirm');
+        if (msg && !window.confirm(msg)) {
+            e.preventDefault();
+        }
+    }, true);
+</script>
 </body>
-
 </html>
+

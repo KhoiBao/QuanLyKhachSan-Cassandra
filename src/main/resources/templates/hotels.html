@@ -1,255 +1,128 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Khách sạn - Quản lý khách sạn</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('hotels')}"></th:block>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item active">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="user">
-
-                <div class="avatar">
-                    A
-                </div>
-
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
     <main class="main">
+        <th:block th:replace="~{fragments :: header('Quản lý khách sạn', 'Quản lý thông tin các khách sạn trong hệ thống')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-                <h1>Quản lý khách sạn</h1>
-                <p>Quản lý thông tin các khách sạn trong hệ thống</p>
-            </div>
-
-            <div class="header-right">
-
-                <button class="notification">
-                    🔔
-                </button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- CONTENT -->
         <section class="card bookings-card">
-
             <div class="card-header">
-
                 <div>
                     <h3>Danh sách khách sạn</h3>
-                    <p>Thông tin các khách sạn đang được quản lý</p>
+                    <p th:text="${#lists.size(hotels)} + ' khách sạn đang được quản lý'"></p>
                 </div>
-
-                <div>
-
-                    <input
-                            type="text"
-                            placeholder="Tìm khách sạn..."
-                            class="search-box"
-                    >
-
-                    <button class="btn">
-                        + Thêm khách sạn
-                    </button>
-
-                </div>
-
+                <form th:action="@{/hotels}" method="get" class="filter-form">
+                    <input type="text" name="keyword" th:value="${fKeyword}" placeholder="Tìm khách sạn..." class="search-box">
+                    <select name="city" class="filter-select">
+                        <option value="">Tất cả thành phố</option>
+                        <option th:each="c : ${cities}" th:value="${c}" th:text="${c}"
+                                th:selected="${c == fCity}">--</option>
+                    </select>
+                    <select name="status" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}"
+                                th:selected="${fStatus != null && s == fStatus}">--</option>
+                    </select>
+                    <button type="submit" class="btn btn-ghost">Lọc</button>
+                    <button type="button" class="btn" onclick="toggleForm('hotelForm')">+ Thêm khách sạn</button>
+                </form>
             </div>
 
+            <!-- FORM THEM / SUA -->
+            <form th:action="@{/hotels}" th:object="${editing}" method="post"
+                  class="entity-form" id="hotelForm"
+                  th:style="${editing.hotelId != null} ? 'display:block' : 'display:none'">
+                <h4 th:text="${editing.hotelId != null} ? 'Sửa khách sạn ' + ${editing.hotelId} : 'Thêm khách sạn mới'">Thêm khách sạn</h4>
+                <input type="hidden" name="hotelId" th:value="${editing.hotelId}">
+                <div class="form-grid">
+                    <label>Tên khách sạn <input type="text" th:field="*{hotelName}" required></label>
+                    <label>Thành phố <input type="text" th:field="*{city}" required></label>
+                    <label class="span-2">Địa chỉ <input type="text" th:field="*{address}" required></label>
+                    <label>Số sao (1-5) <input type="number" min="1" max="5" th:field="*{starRating}" required></label>
+                    <label>Điện thoại <input type="text" th:field="*{phone}"></label>
+                    <label>Email <input type="email" th:field="*{email}"></label>
+                    <label>Trạng thái
+                        <select th:field="*{status}">
+                            <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}">--</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn"
+                            th:text="${editing.hotelId != null} ? 'Cập nhật' : 'Thêm mới'">Lưu</button>
+                    <a th:href="@{/hotels}" class="btn btn-ghost">Hủy</a>
+                </div>
+            </form>
 
             <!-- TABLE -->
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                     <tr>
                         <th>Mã khách sạn</th>
                         <th>Tên khách sạn</th>
+                        <th>Thành phố</th>
                         <th>Địa chỉ</th>
+                        <th>Số sao</th>
                         <th>Số phòng</th>
                         <th>Trạng thái</th>
+                        <th th:if="${canManageHotels}">Thao tác</th>
                     </tr>
-
                     </thead>
-
-
                     <tbody>
-
-                    <tr>
-
+                    <tr th:each="h : ${pageItems}">
+                        <td><strong th:text="'#' + ${h.hotelId}">#KS000</strong></td>
+                        <td th:text="${h.hotelName}">--</td>
+                        <td th:text="${h.city}">--</td>
+                        <td th:text="${h.address}">--</td>
+                        <td th:text="${h.starText}">★★★</td>
+                        <td th:text="${h.totalRooms}">0</td>
                         <td>
-                            <strong>#KS001</strong>
+                            <span class="badge" th:classappend="${h.status.cssClass}"
+                                  th:text="${h.status.label}">--</span>
                         </td>
-
-                        <td>
-                            Grand Hotel TP.HCM
+                        <td th:if="${canManageHotels}">
+                            <a class="btn-link" th:href="@{/hotels(edit=${h.hotelId})}">Sửa</a>
+                            <form th:action="@{/hotels/{id}/delete(id=${h.hotelId})}" method="post"
+                                  class="inline-form" th:if="${canDelete}"
+                                  th:data-confirm="${'Xóa khách sạn ' + h.hotelId + '?'}">
+                                <button type="submit" class="btn-link btn-danger">Xóa</button>
+                            </form>
                         </td>
-
-                        <td>
-                            123 Nguyễn Huệ
-                        </td>
-
-                        <td>
-                            120
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Hoạt động
-                            </span>
-                        </td>
-
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KS002</strong>
-                        </td>
-
-                        <td>
-                            Sunshine Hotel Đà Nẵng
-                        </td>
-
-                        <td>
-                            25 Võ Nguyên Giáp
-                        </td>
-
-                        <td>
-                            85
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Hoạt động
-                            </span>
-                        </td>
-
+                    <tr th:if="${#lists.isEmpty(pageItems)}">
+                        <td colspan="8" class="empty-state">Không có khách sạn nào khớp bộ lọc.</td>
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KS003</strong>
-                        </td>
-
-                        <td>
-                            Royal Hotel Hà Nội
-                        </td>
-
-                        <td>
-                            88 Hoàn Kiếm
-                        </td>
-
-                        <td>
-                            100
-                        </td>
-
-                        <td>
-                            <span class="badge pending">
-                                Tạm ngưng
-                            </span>
-                        </td>
-
-                    </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
+            <div th:replace="~{fragments :: pagination(${currentPage}, ${totalPages})}"></div>
         </section>
-
     </main>
-
 </div>
-
+<script th:inline="javascript">
+    function toggleForm(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    // Xac nhan truoc khi submit cac form co data-confirm (cho phep JS chuan Thymeleaf 3.1)
+    document.addEventListener('submit', function (e) {
+        const msg = e.target.getAttribute('data-confirm');
+        if (msg && !window.confirm(msg)) {
+            e.preventDefault();
+        }
+    }, true);
+</script>
 </body>
-
 </html>
+

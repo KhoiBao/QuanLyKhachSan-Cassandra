@@ -1,335 +1,144 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Phòng - Quản lý khách sạn</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('rooms')}"></th:block>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item active">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="user">
-
-                <div class="avatar">
-                    A
-                </div>
-
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
     <main class="main">
+        <th:block th:replace="~{fragments :: header('Quản lý phòng', 'Quản lý thông tin và trạng thái các phòng')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-                <h1>Quản lý phòng</h1>
-                <p>Quản lý thông tin và trạng thái các phòng</p>
-            </div>
-
-            <div class="header-right">
-
-                <button class="notification">
-                    🔔
-                </button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- CONTENT -->
         <section class="card bookings-card">
-
             <div class="card-header">
-
                 <div>
                     <h3>Danh sách phòng</h3>
-                    <p>Thông tin phòng của các khách sạn</p>
+                    <p th:text="${#lists.size(rooms)} + ' phòng của các khách sạn'"></p>
                 </div>
-
-                <div>
-
-                    <input
-                            type="text"
-                            placeholder="Tìm phòng..."
-                            class="search-box"
-                    >
-
-                    <button class="btn">
-                        + Thêm phòng
-                    </button>
-
-                </div>
-
+                <form th:action="@{/rooms}" method="get" class="filter-form">
+                    <select name="hotelId" class="filter-select">
+                        <option value="">Tất cả khách sạn</option>
+                        <option th:each="h : ${hotels}" th:value="${h.hotelId}"
+                                th:text="${h.displayName}" th:selected="${h.hotelId == fHotelId}">--</option>
+                    </select>
+                    <select name="roomType" class="filter-select">
+                        <option value="">Tất cả loại phòng</option>
+                        <option th:each="t : ${roomTypes}" th:value="${t}" th:text="${t}"
+                                th:selected="${t == fRoomType}">--</option>
+                    </select>
+                    <select name="status" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}"
+                                th:selected="${fStatus != null && s == fStatus}">--</option>
+                    </select>
+                    <button type="submit" class="btn btn-ghost">Lọc</button>
+                    <button type="button" class="btn" onclick="toggleForm('roomForm')">+ Thêm phòng</button>
+                </form>
             </div>
 
-
-            <!-- FILTER -->
-            <div class="filter-container">
-
-                <select class="filter-select">
-
-                    <option value="">
-                        Tất cả trạng thái
-                    </option>
-
-                    <option>
-                        Trống
-                    </option>
-
-                    <option>
-                        Đã đặt
-                    </option>
-
-                    <option>
-                        Bảo trì
-                    </option>
-
-                </select>
-
-            </div>
-
+            <!-- FORM THEM / SUA -->
+            <form th:action="@{/rooms}" th:object="${editing}" method="post"
+                  class="entity-form" id="roomForm"
+                  th:style="${editing.roomNumber != null} ? 'display:block' : 'display:none'">
+                <h4 th:text="${editing.roomNumber != null} ? 'Sửa phòng ' + ${editing.displayCode} : 'Thêm phòng mới'">Thêm phòng</h4>
+                <input type="hidden" name="originalKey" th:value="${editing.displayCode}">
+                <div class="form-grid">
+                    <label>Khách sạn
+                        <select th:field="*{hotelId}" required>
+                            <option value="">-- Chọn khách sạn --</option>
+                            <option th:each="h : ${hotels}" th:value="${h.hotelId}"
+                                    th:text="${h.displayName}">--</option>
+                        </select>
+                    </label>
+                    <label>Số phòng <input type="number" min="1" th:field="*{roomNumber}" required></label>
+                    <label>Loại phòng
+                        <select th:field="*{roomType}" required>
+                            <option th:each="t : ${roomTypes}" th:value="${t}" th:text="${t}">--</option>
+                        </select>
+                    </label>
+                    <label>Giá / đêm (VND) <input type="text" name="price" th:value="${editing.pricePerNight}" required></label>
+                    <label>Sức chứa <input type="number" min="1" th:field="*{capacity}"></label>
+                    <label>Tầng <input type="number" min="1" th:field="*{floor}"></label>
+                    <label>Trạng thái
+                        <select th:field="*{status}">
+                            <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}">--</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn"
+                            th:text="${editing.roomNumber != null} ? 'Cập nhật' : 'Thêm mới'">Lưu</button>
+                    <a th:href="@{/rooms}" class="btn btn-ghost">Hủy</a>
+                </div>
+            </form>
 
             <!-- TABLE -->
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                     <tr>
-                        <th>Số phòng</th>
+                        <th>Mã phòng</th>
                         <th>Khách sạn</th>
                         <th>Loại phòng</th>
-                        <th>Giá phòng</th>
+                        <th>Giá / đêm</th>
+                        <th>Sức chứa</th>
+                        <th>Tầng</th>
                         <th>Trạng thái</th>
+                        <th th:if="${canManageHotels}">Thao tác</th>
                     </tr>
-
                     </thead>
-
-
                     <tbody>
-
-                    <tr>
-
+                    <tr th:each="r : ${pageItems}">
+                        <td><strong th:text="${r.displayCode}">KS000-000</strong></td>
+                        <td th:text="${r.hotelName}">--</td>
+                        <td th:text="${r.roomType}">--</td>
+                        <td th:text="${#numbers.formatDecimal(r.pricePerNight, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</td>
+                        <td th:text="${r.capacity}">0</td>
+                        <td th:text="${r.floor}">0</td>
                         <td>
-                            <strong>101</strong>
+                            <span class="badge" th:classappend="${r.status.cssClass}"
+                                  th:text="${r.status.label}">--</span>
                         </td>
-
-                        <td>
-                            Grand Hotel TP.HCM
+                        <td th:if="${canManageHotels}">
+                            <a class="btn-link" th:href="@{/rooms(edit=${r.displayCode})}">Sửa</a>
+                            <form th:action="@{/rooms/delete}" method="post" class="inline-form"
+                                  th:if="${canDelete}"
+                                  th:data-confirm="${'Xóa phòng ' + r.displayCode + '?'}">
+                                <input type="hidden" name="hotelId" th:value="${r.hotelId}">
+                                <input type="hidden" name="roomNumber" th:value="${r.roomNumber}">
+                                <button type="submit" class="btn-link btn-danger">Xóa</button>
+                            </form>
                         </td>
-
-                        <td>
-                            Standard
-                        </td>
-
-                        <td>
-                            500.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge available">
-                                Trống
-                            </span>
-                        </td>
-
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>102</strong>
-                        </td>
-
-                        <td>
-                            Grand Hotel TP.HCM
-                        </td>
-
-                        <td>
-                            Deluxe
-                        </td>
-
-                        <td>
-                            800.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Đã đặt
-                            </span>
-                        </td>
-
+                    <tr th:if="${#lists.isEmpty(pageItems)}">
+                        <td colspan="8" class="empty-state">Không có phòng nào khớp bộ lọc.</td>
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>201</strong>
-                        </td>
-
-                        <td>
-                            Sunshine Hotel Đà Nẵng
-                        </td>
-
-                        <td>
-                            Suite
-                        </td>
-
-                        <td>
-                            1.500.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge cancelled">
-                                Bảo trì
-                            </span>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>202</strong>
-                        </td>
-
-                        <td>
-                            Sunshine Hotel Đà Nẵng
-                        </td>
-
-                        <td>
-                            Deluxe
-                        </td>
-
-                        <td>
-                            900.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge available">
-                                Trống
-                            </span>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>301</strong>
-                        </td>
-
-                        <td>
-                            Royal Hotel Hà Nội
-                        </td>
-
-                        <td>
-                            Standard
-                        </td>
-
-                        <td>
-                            600.000đ
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Đã đặt
-                            </span>
-                        </td>
-
-                    </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
+            <div th:replace="~{fragments :: pagination(${currentPage}, ${totalPages})}"></div>
         </section>
-
     </main>
-
 </div>
-
+<script th:inline="javascript">
+    function toggleForm(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    // Xac nhan truoc khi submit cac form co data-confirm (cho phep JS chuan Thymeleaf 3.1)
+    document.addEventListener('submit', function (e) {
+        const msg = e.target.getAttribute('data-confirm');
+        if (msg && !window.confirm(msg)) {
+            e.preventDefault();
+        }
+    }, true);
+</script>
 </body>
-
 </html>
+
