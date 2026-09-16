@@ -31,4 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-config.json
+src/main/resources/config.json
