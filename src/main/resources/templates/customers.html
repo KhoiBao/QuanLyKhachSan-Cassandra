@@ -1,274 +1,108 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Khách hàng - Quản lý khách sạn</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('customers')}"></th:block>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item active">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="user">
-
-                <div class="avatar">
-                    A
-                </div>
-
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
     <main class="main">
+        <th:block th:replace="~{fragments :: header('Quản lý khách hàng', 'Quản lý thông tin khách hàng của khách sạn')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-                <h1>Quản lý khách hàng</h1>
-                <p>Quản lý thông tin khách hàng của khách sạn</p>
-            </div>
-
-            <div class="header-right">
-
-                <button class="notification">
-                    🔔
-                </button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- CONTENT -->
         <section class="card bookings-card">
-
             <div class="card-header">
-
                 <div>
                     <h3>Danh sách khách hàng</h3>
-                    <p>Thông tin khách hàng đã đăng ký</p>
+                    <p th:text="${#lists.size(guests)} + ' khách hàng đã đăng ký'"></p>
                 </div>
-
-                <div>
-
-                    <input
-                            type="text"
-                            placeholder="Tìm khách hàng..."
-                            class="search-box"
-                    >
-
-                    <button class="btn">
-                        + Thêm khách hàng
-                    </button>
-
-                </div>
-
+                <form th:action="@{/customers}" method="get" class="filter-form">
+                    <input type="text" name="keyword" th:value="${fKeyword}"
+                           placeholder="Tìm tên / SĐT / CCCD..." class="search-box">
+                    <button type="submit" class="btn btn-ghost">Tìm</button>
+                    <button type="button" class="btn" onclick="toggleForm('guestForm')">+ Thêm khách hàng</button>
+                </form>
             </div>
 
+            <!-- FORM THEM / SUA -->
+            <form th:action="@{/customers}" th:object="${editing}" method="post"
+                  class="entity-form" id="guestForm"
+                  th:style="${editing.guestId != null} ? 'display:block' : 'display:none'">
+                <h4 th:text="${editing.guestId != null} ? 'Sửa khách hàng ' + ${editing.displayName} : 'Thêm khách hàng mới'">Thêm khách hàng</h4>
+                <input type="hidden" name="guestId" th:value="${editing.guestId}">
+                <div class="form-grid">
+                    <label>Họ và tên <input type="text" th:field="*{fullName}" required></label>
+                    <label>Số điện thoại <input type="text" th:field="*{phone}" required></label>
+                    <label>Email <input type="email" th:field="*{email}"></label>
+                    <label>CCCD (12 số) <input type="text" th:field="*{cccd}"></label>
+                    <label class="span-2">Địa chỉ <input type="text" th:field="*{address}"></label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn"
+                            th:text="${editing.guestId != null} ? 'Cập nhật' : 'Thêm mới'">Lưu</button>
+                    <a th:href="@{/customers}" class="btn btn-ghost">Hủy</a>
+                </div>
+            </form>
 
             <!-- TABLE -->
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                     <tr>
                         <th>Mã khách hàng</th>
                         <th>Họ và tên</th>
                         <th>Số điện thoại</th>
                         <th>Email</th>
                         <th>CCCD</th>
+                        <th>Địa chỉ</th>
+                        <th>Thao tác</th>
                     </tr>
-
                     </thead>
-
-
                     <tbody>
-
-                    <tr>
-
+                    <tr th:each="g : ${pageItems}">
+                        <td><strong th:text="${g.guestId}">KH000</strong></td>
+                        <td th:text="${g.fullName}">--</td>
+                        <td th:text="${g.phone}">--</td>
+                        <td th:text="${g.email}">--</td>
+                        <td th:text="${g.cccd}">--</td>
+                        <td th:text="${g.address}">--</td>
                         <td>
-                            <strong>#KH001</strong>
+                            <a class="btn-link" th:href="@{/customers(edit=${g.guestId})}">Sửa</a>
+                            <form th:action="@{/customers/{id}/delete(id=${g.guestId})}" method="post"
+                                  class="inline-form" th:if="${canDelete}"
+                                  th:data-confirm="${'Xóa khách hàng ' + g.displayName + '?'}">
+                                <button type="submit" class="btn-link btn-danger">Xóa</button>
+                            </form>
                         </td>
-
-                        <td>
-                            Nguyễn Văn An
-                        </td>
-
-                        <td>
-                            0901234567
-                        </td>
-
-                        <td>
-                            an@gmail.com
-                        </td>
-
-                        <td>
-                            079123456789
-                        </td>
-
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KH002</strong>
-                        </td>
-
-                        <td>
-                            Trần Thị Bình
-                        </td>
-
-                        <td>
-                            0912345678
-                        </td>
-
-                        <td>
-                            binh@gmail.com
-                        </td>
-
-                        <td>
-                            079987654321
-                        </td>
-
+                    <tr th:if="${#lists.isEmpty(pageItems)}">
+                        <td colspan="7" class="empty-state">Không có khách hàng nào khớp từ khóa.</td>
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KH003</strong>
-                        </td>
-
-                        <td>
-                            Lê Minh Hoàng
-                        </td>
-
-                        <td>
-                            0987654321
-                        </td>
-
-                        <td>
-                            hoang@gmail.com
-                        </td>
-
-                        <td>
-                            079456123789
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KH004</strong>
-                        </td>
-
-                        <td>
-                            Phạm Thu Hà
-                        </td>
-
-                        <td>
-                            0938123456
-                        </td>
-
-                        <td>
-                            ha@gmail.com
-                        </td>
-
-                        <td>
-                            079345678912
-                        </td>
-
-                    </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
+            <div th:replace="~{fragments :: pagination(${currentPage}, ${totalPages})}"></div>
         </section>
-
     </main>
-
 </div>
-
+<script th:inline="javascript">
+    function toggleForm(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    // Xac nhan truoc khi submit cac form co data-confirm (cho phep JS chuan Thymeleaf 3.1)
+    document.addEventListener('submit', function (e) {
+        const msg = e.target.getAttribute('data-confirm');
+        if (msg && !window.confirm(msg)) {
+            e.preventDefault();
+        }
+    }, true);
+</script>
 </body>
-
 </html>
+

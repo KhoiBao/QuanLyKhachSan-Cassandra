@@ -1,315 +1,113 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Báo cáo doanh thu - Quản lý khách sạn</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('reports')}"></th:block>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item active">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="user">
-
-                <div class="avatar">
-                    A
-                </div>
-
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
     <main class="main">
-
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-                <h1>Báo cáo doanh thu</h1>
-                <p>Theo dõi tình hình doanh thu của các khách sạn</p>
-            </div>
-
-            <div class="header-right">
-
-                <button class="notification">
-                    🔔
-                </button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-
-            </div>
-
-        </header>
-
+        <th:block th:replace="~{fragments :: header('Báo cáo doanh thu', 'Theo dõi tình hình doanh thu của các khách sạn (chỉ ADMIN / MANAGER)')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
         <!-- STATS -->
-        <section class="stats-container">
-
+        <section class="statistics">
             <div class="stat-card">
-
-                <div class="stat-icon">
-                    💰
-                </div>
-
+                <div class="stat-icon available-icon">💰</div>
                 <div>
-                    <p>Doanh thu hôm nay</p>
-                    <h2>15.000.000đ</h2>
+                    <span>Doanh thu hôm nay</span>
+                    <h2 th:text="${#numbers.formatDecimal(revenueToday, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</h2>
                 </div>
-
             </div>
-
-
             <div class="stat-card">
-
-                <div class="stat-icon">
-                    📈
-                </div>
-
+                <div class="stat-icon booking-icon">📈</div>
                 <div>
-                    <p>Doanh thu tháng</p>
-                    <h2>285.000.000đ</h2>
+                    <span>Doanh thu tháng này</span>
+                    <h2 th:text="${#numbers.formatDecimal(revenueThisMonth, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</h2>
                 </div>
-
             </div>
-
-
             <div class="stat-card">
-
-                <div class="stat-icon">
-                    🧾
-                </div>
-
+                <div class="stat-icon hotel-icon">🧾</div>
                 <div>
-                    <p>Số hóa đơn</p>
-                    <h2>128</h2>
+                    <span>Hóa đơn đã thanh toán</span>
+                    <h2 th:text="${paidInvoiceCount}">0</h2>
                 </div>
-
             </div>
-
-
             <div class="stat-card">
-
-                <div class="stat-icon">
-                    🛏
-                </div>
-
+                <div class="stat-icon room-icon">Σ</div>
                 <div>
-                    <p>Phòng đã đặt</p>
-                    <h2>76</h2>
+                    <span>Tổng doanh thu</span>
+                    <h2 th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</h2>
                 </div>
-
             </div>
-
         </section>
 
-
-        <!-- REPORT TABLE -->
-        <section class="card bookings-card">
-
+        <!-- CHART THEO THANG -->
+        <section class="card bookings-card" style="margin-bottom:24px">
             <div class="card-header">
+                <div>
+                    <h3>Doanh thu 6 tháng gần nhất</h3>
+                    <p>Tính trên các hóa đơn đã thanh toán</p>
+                </div>
+            </div>
+            <div class="chart">
+                <div class="chart-y">
+                    <span th:text="${#numbers.formatDecimal(maxRevenue, 1, 'COMMA', 0, 'POINT')}">0</span>
+                    <span th:text="${#numbers.formatDecimal(maxRevenue / 2, 1, 'COMMA', 0, 'POINT')}">0</span>
+                    <span>0</span>
+                </div>
+                <div class="bars">
+                    <div class="bar-column" th:each="m : ${revenueByMonth}">
+                        <div class="bar"
+                             th:style="'height:' + ${maxRevenue.signum() > 0 ? (m.revenue.longValueExact() * 100 / maxRevenue.longValueExact()) : 0} + '%'"
+                             th:title="${#numbers.formatDecimal(m.revenue, 0, 'COMMA', 0, 'POINT') + ' ₫'}"></div>
+                        <span th:text="${m.label}">T0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
+        <!-- BANG THEO KHACH SAN -->
+        <section class="card bookings-card">
+            <div class="card-header">
                 <div>
                     <h3>Doanh thu theo khách sạn</h3>
-                    <p>Thống kê tình hình kinh doanh của từng khách sạn</p>
+                    <p th:text="${#lists.size(revenueByHotel)} + ' khách sạn có doanh thu'"></p>
                 </div>
-
-                <div>
-
-                    <select class="filter-select">
-
-                        <option>
-                            Tháng 09/2026
-                        </option>
-
-                        <option>
-                            Tháng 08/2026
-                        </option>
-
-                        <option>
-                            Tháng 07/2026
-                        </option>
-
-                    </select>
-
-                </div>
-
             </div>
-
-
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                     <tr>
-                        <th>Mã khách sạn</th>
-                        <th>Tên khách sạn</th>
-                        <th>Số đơn đặt phòng</th>
-                        <th>Số phòng đã đặt</th>
+                        <th>Mã KS</th>
+                        <th>Khách sạn</th>
+                        <th>Số hóa đơn</th>
                         <th>Doanh thu</th>
                     </tr>
-
                     </thead>
-
-
                     <tbody>
-
-                    <tr>
-
+                    <tr th:each="r : ${revenueByHotel}">
+                        <td><strong th:text="${r.hotelId}">KS000</strong></td>
+                        <td th:text="${r.hotelName}">--</td>
+                        <td th:text="${r.invoiceCount}">0</td>
                         <td>
-                            <strong>#KS001</strong>
+                            <strong th:text="${#numbers.formatDecimal(r.revenue, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
                         </td>
-
-                        <td>
-                            Grand Hotel TP.HCM
-                        </td>
-
-                        <td>
-                            52
-                        </td>
-
-                        <td>
-                            48
-                        </td>
-
-                        <td>
-                            <strong>150.000.000đ</strong>
-                        </td>
-
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KS002</strong>
-                        </td>
-
-                        <td>
-                            Sunshine Hotel Đà Nẵng
-                        </td>
-
-                        <td>
-                            35
-                        </td>
-
-                        <td>
-                            32
-                        </td>
-
-                        <td>
-                            <strong>85.000.000đ</strong>
-                        </td>
-
+                    <tr th:if="${#lists.isEmpty(revenueByHotel)}">
+                        <td colspan="4" class="empty-state">Chưa có doanh thu nào được ghi nhận.</td>
                     </tr>
-
-
-                    <tr>
-
-                        <td>
-                            <strong>#KS003</strong>
-                        </td>
-
-                        <td>
-                            Royal Hotel Hà Nội
-                        </td>
-
-                        <td>
-                            21
-                        </td>
-
-                        <td>
-                            20
-                        </td>
-
-                        <td>
-                            <strong>50.000.000đ</strong>
-                        </td>
-
-                    </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </section>
-
     </main>
-
 </div>
-
 </body>
-
 </html>
+

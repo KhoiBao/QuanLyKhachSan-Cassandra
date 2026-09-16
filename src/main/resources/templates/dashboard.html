@@ -1,357 +1,137 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý khách sạn - Dashboard</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('home')}"></th:block>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item active">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-            <div class="user">
-                <div class="avatar">A</div>
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-            </div>
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
     <main class="main">
-
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-                <h1>Dashboard</h1>
-                <p>Tổng quan hệ thống quản lý khách sạn</p>
-            </div>
-
-            <div class="header-right">
-                <button class="notification">🔔</button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-            </div>
-
-        </header>
-
+        <th:block th:replace="~{fragments :: header('Dashboard', 'Tổng quan hệ thống quản lý khách sạn')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
         <!-- STATISTICS -->
         <section class="statistics">
-
             <div class="stat-card">
                 <div class="stat-icon hotel-icon">🏨</div>
-
                 <div>
                     <span>Tổng khách sạn</span>
-                    <h2>8</h2>
-                    <small>Đang hoạt động</small>
+                    <h2 th:text="${totalHotels}">0</h2>
+                    <small th:text="${activeHotels} + ' đang hoạt động'">0 đang hoạt động</small>
                 </div>
             </div>
-
 
             <div class="stat-card">
                 <div class="stat-icon room-icon">🛏</div>
-
                 <div>
                     <span>Tổng số phòng</span>
-                    <h2>245</h2>
-                    <small>Trên toàn hệ thống</small>
+                    <h2 th:text="${totalRooms}">0</h2>
+                    <small th:text="${totalRooms - availableRooms} + ' đang sử dụng'">0 đang sử dụng</small>
                 </div>
             </div>
 
-
             <div class="stat-card">
                 <div class="stat-icon available-icon">✓</div>
-
                 <div>
                     <span>Phòng đang trống</span>
-                    <h2>86</h2>
+                    <h2 th:text="${availableRooms}">0</h2>
                     <small>Có thể đặt phòng</small>
                 </div>
             </div>
 
-
             <div class="stat-card">
                 <div class="stat-icon booking-icon">▣</div>
-
                 <div>
-                    <span>Đặt phòng hôm nay</span>
-                    <h2>32</h2>
-                    <small>+8% so với hôm qua</small>
+                    <span>Đặt phòng</span>
+                    <h2 th:text="${totalBookings}">0</h2>
+                    <small th:text="${activeBookings} + ' đơn đang hiệu lực'">0 đơn đang hiệu lực</small>
                 </div>
             </div>
-
         </section>
-
 
         <!-- CONTENT GRID -->
         <section class="content-grid">
 
-            <!-- REVENUE -->
-            <div class="card revenue-card">
-
+            <!-- RECENT BOOKINGS -->
+            <div class="card bookings-card">
                 <div class="card-header">
-
                     <div>
-                        <h3>Doanh thu</h3>
-                        <p>Thống kê doanh thu trong 7 ngày gần nhất</p>
+                        <h3>Đặt phòng gần nhất</h3>
+                        <p th:text="${totalGuests} + ' khách hàng · ' + ${bookingsThisMonth} + ' đơn trong tháng này'"></p>
                     </div>
-
-                    <select>
-                        <option>7 ngày</option>
-                        <option>30 ngày</option>
-                        <option>3 tháng</option>
-                    </select>
-
+                    <a class="btn-link" th:href="@{/bookings}">Xem tất cả →</a>
                 </div>
 
-                <div class="revenue-total">
-                    <strong>458.500.000 ₫</strong>
-                    <span>+12,5%</span>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Khách sạn</th>
+                            <th>Phòng</th>
+                            <th>Nhận - Trả</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="b : ${recentBookings}">
+                            <td><strong th:text="${b.shortCode}">DP-XXXX</strong></td>
+                            <td th:text="${b.guestName}">--</td>
+                            <td th:text="${b.hotelName}">--</td>
+                            <td th:text="${b.roomNumber}">0</td>
+                            <td>
+                                <span th:text="${#temporals.format(b.checkInDate, 'dd/MM')}">--</span>
+                                →
+                                <span th:text="${#temporals.format(b.checkOutDate, 'dd/MM')}">--</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${b.status.cssClass}"
+                                      th:text="${b.status.label}">--</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentBookings)}">
+                            <td colspan="6" class="empty-state">Chưa có đơn đặt phòng nào.</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="chart">
-
-                    <div class="chart-y">
-                        <span>150M</span>
-                        <span>100M</span>
-                        <span>50M</span>
-                        <span>0</span>
-                    </div>
-
-                    <div class="bars">
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 55%;"></div>
-                            <span>T2</span>
-                        </div>
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 72%;"></div>
-                            <span>T3</span>
-                        </div>
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 63%;"></div>
-                            <span>T4</span>
-                        </div>
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 85%;"></div>
-                            <span>T5</span>
-                        </div>
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 68%;"></div>
-                            <span>T6</span>
-                        </div>
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 91%;"></div>
-                            <span>T7</span>
-                        </div>
-
-                        <div class="bar-column">
-                            <div class="bar" style="height: 78%;"></div>
-                            <span>CN</span>
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
 
-
             <!-- ROOM STATUS -->
-            <div class="card">
-
+            <div class="card room-status">
                 <div class="card-header">
                     <div>
                         <h3>Trạng thái phòng</h3>
-                        <p>Tình trạng phòng hiện tại</p>
+                        <p>Phân bố phòng toàn hệ thống</p>
                     </div>
                 </div>
-
-                <div class="room-status">
-
-                    <div class="status-row">
-                        <span class="status-dot available"></span>
-                        <span>Đang trống</span>
-                        <strong>86</strong>
-                    </div>
-
-                    <div class="status-row">
-                        <span class="status-dot occupied"></span>
-                        <span>Đang sử dụng</span>
-                        <strong>112</strong>
-                    </div>
-
-                    <div class="status-row">
-                        <span class="status-dot booked"></span>
-                        <span>Đã đặt</span>
-                        <strong>31</strong>
-                    </div>
-
-                    <div class="status-row">
-                        <span class="status-dot maintenance"></span>
-                        <span>Bảo trì</span>
-                        <strong>16</strong>
-                    </div>
-
+                <div class="status-row">
+                    <span class="status-dot available"></span> Trống
+                    <strong th:text="${countAvailable}">0</strong>
                 </div>
-
+                <div class="status-row">
+                    <span class="status-dot booked"></span> Đã đặt
+                    <strong th:text="${countBooked}">0</strong>
+                </div>
+                <div class="status-row">
+                    <span class="status-dot occupied"></span> Đang sử dụng
+                    <strong th:text="${countOccupied}">0</strong>
+                </div>
+                <div class="status-row">
+                    <span class="status-dot maintenance"></span> Bảo trì
+                    <strong th:text="${countMaintenance}">0</strong>
+                </div>
             </div>
 
         </section>
-
-
-        <!-- RECENT BOOKINGS -->
-        <section class="card bookings-card">
-
-            <div class="card-header">
-
-                <div>
-                    <h3>Đặt phòng gần đây</h3>
-                    <p>Danh sách các lượt đặt phòng mới nhất</p>
-                </div>
-
-                <button class="view-all">Xem tất cả →</button>
-
-            </div>
-
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-                    <tr>
-                        <th>Mã đặt phòng</th>
-                        <th>Khách hàng</th>
-                        <th>Khách sạn</th>
-                        <th>Phòng</th>
-                        <th>Nhận phòng</th>
-                        <th>Trả phòng</th>
-                        <th>Trạng thái</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-
-                    <tr>
-                        <td><strong>#BK00125</strong></td>
-                        <td>Nguyễn Văn An</td>
-                        <td>Hotel Central</td>
-                        <td>Deluxe 205</td>
-                        <td>15/09/2026</td>
-                        <td>18/09/2026</td>
-                        <td><span class="badge confirmed">Đã xác nhận</span></td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>#BK00124</strong></td>
-                        <td>Trần Minh Anh</td>
-                        <td>Hotel Riverside</td>
-                        <td>Suite 301</td>
-                        <td>16/09/2026</td>
-                        <td>20/09/2026</td>
-                        <td><span class="badge pending">Chờ thanh toán</span></td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>#BK00123</strong></td>
-                        <td>Lê Hoàng Nam</td>
-                        <td>Hotel Central</td>
-                        <td>Standard 102</td>
-                        <td>15/09/2026</td>
-                        <td>17/09/2026</td>
-                        <td><span class="badge confirmed">Đã xác nhận</span></td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>#BK00122</strong></td>
-                        <td>Phạm Thu Hà</td>
-                        <td>Hotel Garden</td>
-                        <td>Deluxe 405</td>
-                        <td>17/09/2026</td>
-                        <td>19/09/2026</td>
-                        <td><span class="badge cancelled">Đã hủy</span></td>
-                    </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
     </main>
-
 </div>
-
 </body>
 </html>
+

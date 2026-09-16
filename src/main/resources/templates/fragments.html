@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<!-- ============ SIDEBAR (dùng chung) ============ -->
+<aside class="sidebar" th:fragment="sidebar(active)">
+    <div class="logo">
+        <div class="logo-icon">H</div>
+        <div>
+            <h2>Hotel Manager</h2>
+            <span>Quản lý khách sạn</span>
+        </div>
+    </div>
+    <nav class="menu">
+        <a th:href="@{/}" class="menu-item" th:classappend="${active}=='home' ? 'active'">
+            <span>▦</span> Dashboard
+        </a>
+        <a th:href="@{/hotels}" class="menu-item" th:classappend="${active}=='hotels' ? 'active'">
+            <span>▣</span> Khách sạn
+        </a>
+        <a th:href="@{/rooms}" class="menu-item" th:classappend="${active}=='rooms' ? 'active'">
+            <span>▤</span> Phòng
+        </a>
+        <a th:href="@{/customers}" class="menu-item" th:classappend="${active}=='customers' ? 'active'">
+            <span>♙</span> Khách hàng
+        </a>
+        <a th:href="@{/bookings}" class="menu-item" th:classappend="${active}=='bookings' ? 'active'">
+            <span>▧</span> Đặt phòng
+        </a>
+        <a th:href="@{/invoices}" class="menu-item" th:classappend="${active}=='invoices' ? 'active'">
+            <span>▤</span> Hóa đơn
+        </a>
+        <a th:href="@{/reports}" class="menu-item" th:classappend="${active}=='reports' ? 'active'">
+            <span>◫</span> Báo cáo doanh thu
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <div class="user">
+            <div class="avatar" th:text="${loginInitial} ?: 'A'">A</div>
+            <div>
+                <strong th:text="${loginFullName} ?: 'Admin'">Admin</strong>
+                <small th:text="${loginRoleLabel} ?: 'Quản trị viên'">Quản trị viên</small>
+            </div>
+            <form th:action="@{/logout}" method="post" style="margin-left:auto">
+                <button type="submit" class="btn-link" title="Đăng xuất">⎋</button>
+            </form>
+        </div>
+    </div>
+</aside>
+
+<!-- ============ HEADER (dùng chung) ============ -->
+<header class="header" th:fragment="header(title, subtitle)">
+    <div>
+        <h1 th:text="${title}">Tiêu đề</h1>
+        <p th:text="${subtitle}">Mô tả</p>
+    </div>
+    <div class="header-right">
+        <div class="date">📅 <span th:text="${todayText}">--/--/----</span></div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-ghost">Đăng xuất</button>
+        </form>
+    </div>
+</header>
+
+<!-- ============ THONG BAO (flash) ============ -->
+<div th:fragment="alerts">
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+</div>
+
+<!-- ============ PHAN TRANG (dung chung) ============ -->
+<nav class="pagination" th:fragment="pagination(currentPage, totalPages)"
+     th:if="${totalPages != null and totalPages > 1}">
+    <span class="page-label"
+          th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}"></span>
+    <span th:each="p : ${#numbers.sequence(1, totalPages)}">
+        <a th:href="${#strings.isEmpty(queryString) ? 'page=' + p : queryString + '&page=' + p}"
+           th:classappend="${p == currentPage} ? 'page-active'"
+           th:text="${p}">1</a>
+    </span>
+</nav>
+
+</body>
+</html>
