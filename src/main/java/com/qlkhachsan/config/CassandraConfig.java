@@ -12,6 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * Ket noi Astra DB - NGUON DUY NHAT la config.json trong resources
+ * (token, keyspace, secureBundle). application.properties chi la fallback
+ * khi config.json khong ghi keyspace/bundle. Khong dung bien moi truong,
+ * khong hardcode credential trong code.
+ */
 @Configuration
 public class CassandraConfig {
 

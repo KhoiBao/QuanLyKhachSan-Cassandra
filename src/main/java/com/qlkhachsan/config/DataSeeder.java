@@ -36,10 +36,11 @@ import com.qlkhachsan.repository.UserStore;
 import com.qlkhachsan.util.InvoiceMath;
 
 /**
- * Tao du lieu mau khi kho du lieu con rong.
+ * Tao du lieu mau khi Astra DB con rong.
  *
- * <p>Chay duoc o CA HAI profile vi chi lam viec qua cac Store (port):
- * profile {@code memory} (mac dinh) va profile {@code cassandra} (Astra DB).
+ * <p>Chi lam viec qua cac Store (port) dang doc/ghi Astra DB
+ * (keyspace khachsan). Seed RIENG tung phan de khong de data that:
+ * tai khoan seed khi bang users trong, nghiep vu seed khi bang hotels trong.
  * Tat seed bang {@code app.seed-on-startup=false}.</p>
  */
 @Component
@@ -72,16 +73,25 @@ public class DataSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (userStore.count() > 0 || hotelStore.count() > 0) {
-            log.info("Bo qua tao du lieu mau: kho du lieu da co du lieu.");
-            return;
+        // Tai khoan dang nhap: seed rieng de DB co data nghiep vu san
+        // van co admin/manager/staff ma khong bi de mat.
+        if (userStore.count() == 0) {
+            log.info("Bang users trong -> tao tai khoan mac dinh...");
+            seedUsers();
+        } else {
+            log.info("Bang users da co du lieu ({} tai khoan) -> giu nguyen.", userStore.count());
         }
-        log.info("Kho du lieu rong -> tao du lieu mau...");
-        seedUsers();
-        seedHotelsAndRooms();
-        seedGuests();
-        seedBookings();
-        log.info("Da tao du lieu mau: {} khach san, {} phong, {} khach hang, {} don dat phong, {} hoa don, {} tai khoan",
+        // Nghiep vu mau: chi seed khi DB hoan toan chua co khach san.
+        if (hotelStore.count() == 0) {
+            log.info("Bang hotels trong -> tao du lieu mau...");
+            seedHotelsAndRooms();
+            seedGuests();
+            seedBookings();
+        } else {
+            log.info("Bang hotels da co du lieu ({} khach san) -> giu nguyen data that.",
+                    hotelStore.count());
+        }
+        log.info("Hien co: {} khach san, {} phong, {} khach hang, {} don dat phong, {} hoa don, {} tai khoan",
                 hotelStore.count(), roomStore.count(), guestStore.count(),
                 bookingStore.count(), invoiceStore.count(), userStore.count());
     }
