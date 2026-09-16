@@ -1,373 +1,163 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Đặt phòng - Quản lý khách sạn</title>
-
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
-
 <div class="layout">
+    <th:block th:replace="~{fragments :: sidebar('bookings')}"></th:block>
 
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <div class="logo-icon">H</div>
-
-            <div>
-                <h2>Hotel Manager</h2>
-                <span>Quản lý khách sạn</span>
-            </div>
-        </div>
-
-
-        <nav class="menu">
-
-            <a href="/" class="menu-item">
-                <span>▦</span>
-                Dashboard
-            </a>
-
-            <a href="/hotels" class="menu-item">
-                <span>▣</span>
-                Khách sạn
-            </a>
-
-            <a href="/rooms" class="menu-item">
-                <span>▤</span>
-                Phòng
-            </a>
-
-            <a href="/customers" class="menu-item">
-                <span>♙</span>
-                Khách hàng
-            </a>
-
-            <a href="/bookings" class="menu-item active">
-                <span>▧</span>
-                Đặt phòng
-            </a>
-
-            <a href="/invoices" class="menu-item">
-                <span>▤</span>
-                Hóa đơn
-            </a>
-
-            <a href="/reports" class="menu-item">
-                <span>◫</span>
-                Báo cáo doanh thu
-            </a>
-
-        </nav>
-
-
-        <div class="sidebar-bottom">
-
-            <div class="user">
-
-                <div class="avatar">
-                    A
-                </div>
-
-                <div>
-                    <strong>Admin</strong>
-                    <small>Quản trị viên</small>
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- ================= MAIN ================= -->
     <main class="main">
+        <th:block th:replace="~{fragments :: header('Quản lý đặt phòng', 'Theo dõi các đơn đặt phòng và luồng xác nhận / nhận / trả phòng')}"></th:block>
+        <div th:replace="~{fragments :: alerts}"></div>
 
-
-        <!-- HEADER -->
-        <header class="header">
-
-            <div>
-
-                <h1>Quản lý đặt phòng</h1>
-
-                <p>
-                    Theo dõi các đơn đặt phòng
-                </p>
-
-            </div>
-
-
-            <div class="header-right">
-
-                <button class="notification">
-                    🔔
-                </button>
-
-                <div class="date">
-                    📅 15/09/2026
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- ================= CONTENT ================= -->
         <section class="card bookings-card">
-
-
-            <!-- TABLE HEADER -->
             <div class="card-header">
-
                 <div>
-
-                    <h3>
-                        Danh sách đặt phòng
-                    </h3>
-
-                    <p>
-                        Danh sách các đơn đặt phòng trong hệ thống
-                    </p>
-
+                    <h3>Danh sách đặt phòng</h3>
+                    <p th:text="${#lists.size(bookings)} + ' đơn đặt phòng trong hệ thống'"></p>
                 </div>
-
-
-                <div>
-
-                    <input
-                            type="text"
-                            placeholder="Tìm mã đặt phòng..."
-                            class="search-box"
-                    >
-
-                    <button class="btn">
-                        + Đặt phòng
-                    </button>
-
-                </div>
-
+                <form th:action="@{/bookings}" method="get" class="filter-form">
+                    <input type="text" name="keyword" th:value="${fKeyword}"
+                           placeholder="Tìm mã đơn / khách..." class="search-box">
+                    <select name="hotelId" class="filter-select">
+                        <option value="">Tất cả khách sạn</option>
+                        <option th:each="h : ${hotels}" th:value="${h.hotelId}" th:text="${h.displayName}"
+                                th:selected="${h.hotelId == fHotelId}">--</option>
+                    </select>
+                    <select name="status" class="filter-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}"
+                                th:selected="${fStatus != null && s == fStatus}">--</option>
+                    </select>
+                    <label class="mini-label">Từ <input type="date" name="from" th:value="${fFrom}"></label>
+                    <label class="mini-label">Đến <input type="date" name="to" th:value="${fTo}"></label>
+                    <button type="submit" class="btn btn-ghost">Lọc</button>
+                    <button type="button" class="btn" onclick="toggleForm('bookingForm')">+ Đặt phòng</button>
+                </form>
             </div>
 
+            <!-- FORM TAO DON -->
+            <form th:action="@{/bookings}" method="post" class="entity-form" id="bookingForm" style="display:none">
+                <h4>Tạo đơn đặt phòng mới</h4>
+                <div class="form-grid">
+                    <label>Khách hàng
+                        <select name="guestId" required>
+                            <option value="">-- Chọn khách hàng --</option>
+                            <option th:each="g : ${guests}" th:value="${g.guestId}"
+                                    th:text="${g.displayName}">--</option>
+                        </select>
+                    </label>
+                    <label>Khách sạn
+                        <select name="hotelId" id="bkHotel" required onchange="loadRooms()">
+                            <option value="">-- Chọn khách sạn --</option>
+                            <option th:each="h : ${hotels}" th:value="${h.hotelId}"
+                                    th:text="${h.displayName}">--</option>
+                        </select>
+                    </label>
+                    <label>Phòng
+                        <select name="roomNumber" id="bkRoom" required>
+                            <option value="">-- Chọn khách sạn trước --</option>
+                        </select>
+                    </label>
+                    <label>Ngày nhận phòng <input type="date" name="checkInDate" required></label>
+                    <label>Ngày trả phòng <input type="date" name="checkOutDate" required></label>
+                    <label class="span-2">Ghi chú <input type="text" name="notes"></label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Tạo đơn</button>
+                    <button type="button" class="btn btn-ghost" onclick="toggleForm('bookingForm')">Hủy</button>
+                </div>
+            </form>
 
-            <!-- ================= TABLE ================= -->
+            <!-- TABLE -->
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                     <tr>
-
-                        <th>
-                            Mã đặt phòng
-                        </th>
-
-                        <th>
-                            Khách hàng
-                        </th>
-
-                        <th>
-                            Khách sạn
-                        </th>
-
-                        <th>
-                            Phòng
-                        </th>
-
-                        <th>
-                            Nhận phòng
-                        </th>
-
-                        <th>
-                            Trả phòng
-                        </th>
-
-                        <th>
-                            Trạng thái
-                        </th>
-
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Khách sạn</th>
+                        <th>Phòng</th>
+                        <th>Nhận → Trả</th>
+                        <th>Đêm</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
-
                     </thead>
-
-
                     <tbody>
-
-
-                    <!-- BOOKING 1 -->
-                    <tr>
-
+                    <tr th:each="b : ${pageItems}">
+                        <td><strong th:text="${b.shortCode}">DP-XXXX</strong></td>
+                        <td th:text="${b.guestName}">--</td>
+                        <td th:text="${b.hotelName}">--</td>
+                        <td th:text="${b.roomNumber} + ' - ' + ${b.roomType}">--</td>
                         <td>
-                            <strong>
-                                #DP001
-                            </strong>
+                            <span th:text="${#temporals.format(b.checkInDate, 'dd/MM/yyyy')}">--</span> →
+                            <span th:text="${#temporals.format(b.checkOutDate, 'dd/MM/yyyy')}">--</span>
                         </td>
-
+                        <td th:text="${b.nights}">0</td>
+                        <td th:text="${#numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</td>
                         <td>
-                            Nguyễn Văn An
+                            <span class="badge" th:classappend="${b.status.cssClass}"
+                                  th:text="${b.status.label}">--</span>
                         </td>
-
-                        <td>
-                            Grand Hotel TP.HCM
+                        <td class="actions">
+                            <form th:each="n : ${b.status.nextAllowed}"
+                                  th:action="@{/bookings/{id}/status(id=${b.bookingId})}"
+                                  method="post" class="inline-form">
+                                <input type="hidden" name="status" th:value="${n.name()}">
+                                <button type="submit" class="btn-link" th:text="${n.label}">--</button>
+                            </form>
+                            <form th:action="@{/bookings/{id}/delete(id=${b.bookingId})}" method="post"
+                                  class="inline-form" th:if="${canDelete}"
+                                  th:data-confirm="${'Xóa đơn ' + b.shortCode + '?'}">
+                                <button type="submit" class="btn-link btn-danger">Xóa</button>
+                            </form>
                         </td>
-
-                        <td>
-                            101
-                        </td>
-
-                        <td>
-                            15/09/2026
-                        </td>
-
-                        <td>
-                            17/09/2026
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Đã đặt
-                            </span>
-                        </td>
-
                     </tr>
-
-
-                    <!-- BOOKING 2 -->
-                    <tr>
-
-                        <td>
-                            <strong>
-                                #DP002
-                            </strong>
-                        </td>
-
-                        <td>
-                            Trần Thị Bình
-                        </td>
-
-                        <td>
-                            Sunshine Hotel Đà Nẵng
-                        </td>
-
-                        <td>
-                            205
-                        </td>
-
-                        <td>
-                            16/09/2026
-                        </td>
-
-                        <td>
-                            19/09/2026
-                        </td>
-
-                        <td>
-                            <span class="badge confirmed">
-                                Đã đặt
-                            </span>
-                        </td>
-
+                    <tr th:if="${#lists.isEmpty(pageItems)}">
+                        <td colspan="9" class="empty-state">Không có đơn đặt phòng nào khớp bộ lọc.</td>
                     </tr>
-
-
-                    <!-- BOOKING 3 -->
-                    <tr>
-
-                        <td>
-                            <strong>
-                                #DP003
-                            </strong>
-                        </td>
-
-                        <td>
-                            Lê Minh Hoàng
-                        </td>
-
-                        <td>
-                            Grand Hotel TP.HCM
-                        </td>
-
-                        <td>
-                            302
-                        </td>
-
-                        <td>
-                            20/09/2026
-                        </td>
-
-                        <td>
-                            22/09/2026
-                        </td>
-
-                        <td>
-                            <span class="badge pending">
-                                Chờ xác nhận
-                            </span>
-                        </td>
-
-                    </tr>
-
-
-                    <!-- BOOKING 4 -->
-                    <tr>
-
-                        <td>
-                            <strong>
-                                #DP004
-                            </strong>
-                        </td>
-
-                        <td>
-                            Phạm Thu Hà
-                        </td>
-
-                        <td>
-                            Hotel Garden
-                        </td>
-
-                        <td>
-                            405
-                        </td>
-
-                        <td>
-                            17/09/2026
-                        </td>
-
-                        <td>
-                            19/09/2026
-                        </td>
-
-                        <td>
-                            <span class="badge cancelled">
-                                Đã hủy
-                            </span>
-                        </td>
-
-                    </tr>
-
-
                     </tbody>
-
                 </table>
-
             </div>
-
-
+            <div th:replace="~{fragments :: pagination(${currentPage}, ${totalPages})}"></div>
         </section>
-
-
     </main>
-
 </div>
-
+<script th:inline="javascript">
+    // Dữ liệu phòng theo khách sạn để điền dropdown "Phòng"
+    const roomsByHotel = /*[[${roomsByHotel}]]*/ {};
+    function toggleForm(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+    function loadRooms() {
+        const hotelId = document.getElementById('bkHotel').value;
+        const roomSelect = document.getElementById('bkRoom');
+        roomSelect.innerHTML = '<option value="">-- Chọn phòng --</option>';
+        const rooms = roomsByHotel[hotelId] || [];
+        rooms.forEach(function (r) {
+            const opt = document.createElement('option');
+            opt.value = r.roomNumber;
+            opt.textContent = r.roomNumber + ' - ' + r.roomType + ' (' + r.statusLabel + ')';
+            if (!r.bookable) opt.disabled = true;
+            roomSelect.appendChild(opt);
+        });
+    }
+    // Xac nhan truoc khi submit cac form co data-confirm (cho phep JS chuan Thymeleaf 3.1)
+    document.addEventListener('submit', function (e) {
+        const msg = e.target.getAttribute('data-confirm');
+        if (msg && !window.confirm(msg)) {
+            e.preventDefault();
+        }
+    }, true);
+</script>
 </body>
-
 </html>
+

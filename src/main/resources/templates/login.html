@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Quản lý khách sạn</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body class="login-body">
+<div class="login-wrap">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-icon">H</div>
+            <div>
+                <h2>Hotel Manager</h2>
+                <span>Quản lý khách sạn</span>
+            </div>
+        </div>
+
+        <h1>Đăng nhập</h1>
+        <p class="login-sub">Dùng tài khoản hệ thống để tiếp tục</p>
+
+        <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <div class="alert alert-info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+
+        <form th:action="@{/login}" method="post" class="form-vertical">
+            <label>
+                Tên đăng nhập
+                <input type="text" name="username" required autofocus placeholder="admin">
+            </label>
+            <label>
+                Mật khẩu
+                <input type="password" name="password" required placeholder="••••••••">
+            </label>
+            <button type="submit" class="btn btn-block">Đăng nhập</button>
+        </form>
+
+        <p class="login-hint">
+            Tài khoản mẫu: admin/admin123 · manager/manager123 · staff/staff123
+        </p>
+        <p class="login-hint">
+            Chưa có tài khoản? <a th:href="@{/register}">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

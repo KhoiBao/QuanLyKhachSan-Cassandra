@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lỗi - Quản lý khách sạn</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body class="login-body">
+<div class="login-wrap">
+    <div class="login-card" style="text-align:center">
+        <h1 th:text="${status} ?: 'Lỗi'">Lỗi</h1>
+        <p class="login-sub" th:text="${error} ?: 'Có lỗi xảy ra khi xử lý yêu cầu.'">Có lỗi xảy ra.</p>
+        <p><a th:href="@{/}">← Về trang chủ</a></p>
+    </div>
+</div>
+</body>
+</html>
