@@ -2,6 +2,7 @@ package com.qlkhachsan;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +15,7 @@ public class QlkhachsanApplication {
     }
 
     @Bean
+    @ConditionalOnBean(CqlSession.class)
     CommandLineRunner testCassandra(CqlSession session) {
 
         return args -> {

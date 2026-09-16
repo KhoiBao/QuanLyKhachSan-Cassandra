@@ -45,11 +45,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-		<dependency> 
-    <groupId>com.datastax.oss</groupId> 
-    <artifactId>java-driver-core</artifactId> 
-    <version>4.17.0</version> 
-</dependency> 
 
 		<!-- ===== Validation (Bean Validation / Jakarta) ===== -->
 		<dependency>
